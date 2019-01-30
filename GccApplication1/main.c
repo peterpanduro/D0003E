@@ -106,25 +106,68 @@ void writeChar(char ch, uint16_t pos) {
 	}
 }
 
+void writeLong(long i){
+	int index = 5;  //Index of where the number should be printed
+	int printNumber;
+	do {
+		printNumber = i%10;
+		i = i/10;
+		writeChar(printNumber+'0', index); //0 == 48 in ASCII
+		index = index - 1;
+	} while (i > 0 && index > -1);
+}
+
+void printPrim(void){
+	long number = 3;
+	while (10000000 != number){
+		if (isPrime(number) == 1){
+			writeLong(number);
+		}
+		number +=1;
+	}
+}
+
+int isPrime(long number){
+	for (int i = 3; i<number; i+=2){
+		if (number%i == 0){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+
+void blink(void){
+	while(1){
+		if (TCNT1 > 0xFFFF/2) {
+			LCDDR0 = 0x22;
+			LCDDR1 = 0x44;
+			LCDDR3 = 0x66;
+		} else {
+			LCDDR0 = 0x0;
+			LCDDR1 = 0x0;
+			LCDDR3 = 0x0;
+		}
+	}
+}
+
+void setupCLK(void) {
+	TCCR1B |= (1<<CS12);
+}
+
+void button(void) {
+	
+}
+
 int main(void)
 {
 	CLKPR = 0x80;
 	CLKPR = 0x00;
     setupLCD();
-	
-	writeChar('0', 0);
-	writeChar('1', 1);
-	writeChar('2', 2);
-	writeChar('3', 3);
-	writeChar('4', 4);
-	writeChar('5', 5);
-	writeChar('6', 0);
-	writeChar('7', 1);
-	writeChar('8', 2);
-	writeChar('9', 3);
-	
-    while (1) 
-    {
+	setupCLK();
+	blink();
+	while (1) {
+		/*printPrim();*/
     }
 }
 
