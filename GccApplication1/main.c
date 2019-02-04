@@ -22,6 +22,7 @@ void setupLCD(void) {
 	// Drive time 300?s. Contrast 3,35V
 	//LCDCCR = (LCDCC3<<1) | (LCDCC2<<1) | (LCDCC1<<1) | (LCDCC0<<1);
 	LCDCCR = 0x0f;
+	PORTB = 0x80 | PORTB;
 }
 
 void writeChar(char ch, uint16_t pos) {
@@ -157,6 +158,22 @@ void setupCLK(void) {
 
 void button(void) {
 	
+	LCDDR0 = 0x04;
+	/*int y = 0;
+	while(1){
+		while((PINB >> 7) & 1U){
+			y = 1;
+		}
+		if (y == 1) {
+			LCDDR0 = LCDDR0==0x40 ? 0x04 : 0x40;
+			y = 0;
+		}
+	}*/
+	while (1) {
+		while (((PINB >> 7) & 1U) == 1) {}
+		while (((PINB >> 7) & 1U) == 0) {}
+		LCDDR0 = LCDDR0==0x40 ? 0x04 : 0x40;
+	}
 }
 
 int main(void)
@@ -165,7 +182,9 @@ int main(void)
 	CLKPR = 0x00;
     setupLCD();
 	setupCLK();
-	blink();
+	
+	button();
+	//blink();
 	while (1) {
 		/*printPrim();*/
     }
