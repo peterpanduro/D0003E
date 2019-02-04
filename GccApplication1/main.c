@@ -22,8 +22,17 @@ void setupLCD(void) {
 	// Drive time 300?s. Contrast 3,35V
 	//LCDCCR = (LCDCC3<<1) | (LCDCC2<<1) | (LCDCC1<<1) | (LCDCC0<<1);
 	LCDCCR = 0x0f;
-	PORTB = 0x80 | PORTB;
 }
+
+void setupCLK(void) {
+	CLKPR = 0x80;
+	CLKPR = 0x00;
+	TCCR1B |= (1<<CS12);
+}
+
+/************************************************************************/
+/*                     Standalone methods                               */
+/************************************************************************/
 
 void writeChar(char ch, uint16_t pos) {
 	if (pos > 5) {
@@ -42,7 +51,11 @@ void writeChar(char ch, uint16_t pos) {
 	d4 += pos/2;
 	
 	// Blank the new number
-	*d1 &= (0xf<<shift2);
+	if (shift == 4) {
+		LCDDR0 = 0x6f & LCDDR0;
+	} else {
+		LCDDR0 = 0xf6 & LCDDR0;
+	}
 	*d2 &= (0xf<<shift2);
 	*d3 &= (0xf<<shift2);
 	*d4 &= (0xf<<shift2);
@@ -137,7 +150,6 @@ int isPrime(long number){
 	return 1;
 }
 
-
 void blink(void){
 	while(1){
 		if (TCNT1 > 0xFFFF/2) {
@@ -152,41 +164,86 @@ void blink(void){
 	}
 }
 
-void setupCLK(void) {
-	TCCR1B |= (1<<CS12);
-}
-
 void button(void) {
-	
 	LCDDR0 = 0x04;
-	/*int y = 0;
-	while(1){
-		while((PINB >> 7) & 1U){
-			y = 1;
-		}
-		if (y == 1) {
-			LCDDR0 = LCDDR0==0x40 ? 0x04 : 0x40;
-			y = 0;
-		}
-	}*/
 	while (1) {
 		while (((PINB >> 7) & 1U) == 1) {}
 		while (((PINB >> 7) & 1U) == 0) {}
-		LCDDR0 = LCDDR0==0x40 ? 0x04 : 0x40;
+		LCDDR0 = LCDDR0 == 0x40 ? 0x04 : 0x40;
+	}
+}
+
+/************************************************************************/
+/* Concurrent methods                                                   */
+/************************************************************************/
+
+extern int buttonPressed = 0;
+
+int isPrime_2(long number){
+	for (int i = 3; i<number; i+=2){
+		// Other functions
+		button_2();
+		blink_2();
+		if (number%i == 0){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+
+void blink_2(void){
+	if (TCNT1 > 0xFFFF/2) {
+		LCDDR0 = 0x22 | LCDDR0;
+		LCDDR1 = 0x44 | LCDDR1;
+		LCDDR3 = 0x66 | LCDDR3;
+	} else {
+		LCDDR0 = 0xdd & LCDDR0;
+		LCDDR1 = 0xbb & LCDDR1;
+		LCDDR3 = 0x99 & LCDDR3;
+	}
+}
+
+void button_2(void) {
+	if ((((PINB >> 7) & 1U) == 0) && !buttonPressed) {
+		// Button down first time
+		buttonPressed = 1;
+	} else if ((((PINB >> 7) & 1U) == 1) && buttonPressed) {
+		// Button is just released
+		buttonPressed = 0;
+		if ((LCDDR0 >> 2) & 1U) {
+			LCDDR0 = LCDDR0 & 0xbb;
+			LCDDR0 = LCDDR0 | 0x40;
+		} else  {
+			LCDDR0 = LCDDR0 & 0xbb;
+			LCDDR0 = LCDDR0 | 0x4;
+		}
+	}
+}
+
+void concurrent(void) {
+	// Light number 1 on LCD
+	LCDDR0 = 0x04;
+	int number = 25000;
+	number = number % 2 == 0 ? number+1 : number;
+	while (1) {
+		if (isPrime_2(number) == 1){
+			writeLong(number);
+		}
+		number += 2;
 	}
 }
 
 int main(void)
 {
-	CLKPR = 0x80;
-	CLKPR = 0x00;
+	PORTB = 0x80 | PORTB;
     setupLCD();
 	setupCLK();
 	
-	button();
+	//button();
 	//blink();
-	while (1) {
-		/*printPrim();*/
-    }
+	//printPrim();
+	
+	concurrent();
 }
 
