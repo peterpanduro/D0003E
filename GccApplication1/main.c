@@ -11,16 +11,16 @@
 
 void setupLCD(void) {
 	// Enable. Low power wave form.
-	//LCDCRA = (LCDEN<<1) | (LCDAB<<1);
+	//LCDCRA = (1<<LCDEN) | (1<<LCDAB);
 	LCDCRA = 0xc0;
 	// External clock. 1/4 Duty. 25 segments port mask
-	//LCDCRB = (LCDCS<<1) | (LCDMUX1<<1) | (LCDMUX0<<1) | (LCDPM2<<1) | (LCDPM1<<1) | (LCDPM0<<1);
-	LCDCRB = 0xb7;//= 0xa6;
+	//LCDCRB = (1<<LCDCS) | (1<<LCDMUX1) | (1<<LCDMUX0) | (1<<LCDPM2) | (1<<LCDPM1) | (1<<LCDPM0);
+	LCDCRB = 0xb7;
 	// Frame rate
-	//LCDFRR = (LCDCD2<<1) | (LCDCD1<<1) | (LCDCD0<<1);
+	//LCDFRR = (1<<LCDCD2) | (1<<LCDCD1) | (1<<LCDCD0);
 	LCDFRR = 0x06;
 	// Drive time 300?s. Contrast 3,35V
-	//LCDCCR = (LCDCC3<<1) | (LCDCC2<<1) | (LCDCC1<<1) | (LCDCC0<<1);
+	//LCDCCR = (1<<LCDCC3) | (1<<LCDCC2) | (1<<LCDCC1) | (1<<LCDCC0);
 	LCDCCR = 0x0f;
 }
 
@@ -34,25 +34,28 @@ void setupCLK(void) {
 /*                     Standalone methods                               */
 /************************************************************************/
 
-void writeChar(char ch, uint16_t pos) {
-	if (pos > 5) {
+void writeChar(char ch, uint16_t position) {
+	if (position > 5) {
 		return;
 	}
-	int shift = pos%2 ? 4 : 0;
-	int shift2 = pos%2 ? 0 : 4;
+	int shift = position%2 ? 4 : 0; //If position is an even number its the UPPER nibbles that changes AKA shift left 4
+									//and use OR in the new bits
+	
+	int shift2 = position%2 ? 0 : 4;//If position is an even number the LOWER nibbles are kept. So the same thing happens
+									// but reversed.
 
-	uint8_t *d1 = &LCDDR0;
+	uint8_t *d1 = &LCDDR0;			//Makes pointers to the different initial segments of the LCD-display
 	uint8_t *d2 = &LCDDR5;
 	uint8_t *d3 = &LCDDR10;
 	uint8_t *d4 = &LCDDR15;
-	d1 += pos/2;
-	d2 += pos/2;
-	d3 += pos/2;
-	d4 += pos/2;
+	d1 += position/2;				//Moves the pointer so that it points to the corresponding segment that displays the number.
+	d2 += position/2;
+	d3 += position/2;
+	d4 += position/2;
 	
-	// Blank the new number
+	//Blank position of the new number. This depends on the nibbles and position. 
 	if (shift == 4) {
-		LCDDR0 = 0x6f & LCDDR0;
+		LCDDR0 = 0x6f & LCDDR0; //LCDDR0 also corresponds to bits used by Blink() and button()
 	} else {
 		LCDDR0 = 0xf6 & LCDDR0;
 	}
@@ -133,7 +136,7 @@ void writeLong(long i){
 
 void printPrim(void){
 	long number = 3;
-	while (10000000 != number){
+	while (1){
 		if (isPrime(number) == 1){
 			writeLong(number);
 		}
@@ -142,7 +145,7 @@ void printPrim(void){
 }
 
 int isPrime(long number){
-	for (int i = 3; i<number; i+=2){
+	for (int i = 2; i<number; i+=1){
 		if (number%i == 0){
 			return 0;
 		}
@@ -167,9 +170,9 @@ void blink(void){
 void button(void) {
 	LCDDR0 = 0x04;
 	while (1) {
-		while (((PINB >> 7) & 1U) == 1) {}
-		while (((PINB >> 7) & 1U) == 0) {}
-		LCDDR0 = LCDDR0 == 0x40 ? 0x04 : 0x40;
+		while (((PINB >> 7) & 1U) == 1) {}		// busy-wait for push down on joystick
+		while (((PINB >> 7) & 1U) == 0) {}		// busy-wait for release of joystick
+		LCDDR0 = LCDDR0 == 0x40 ? 0x04 : 0x40;	// swap the display number 1 and 2
 	}
 }
 
@@ -177,13 +180,10 @@ void button(void) {
 /* Concurrent methods                                                   */
 /************************************************************************/
 
-extern int buttonPressed = 0;
+static int buttonPressed = 0;
 
 int isPrime_2(long number){
-	for (int i = 3; i<number; i+=2){
-		// Other functions
-		button_2();
-		blink_2();
+	for (int i = 2; i<number; i+=1){
 		if (number%i == 0){
 			return 0;
 		}
@@ -225,12 +225,13 @@ void concurrent(void) {
 	// Light number 1 on LCD
 	LCDDR0 = 0x04;
 	int number = 25000;
-	number = number % 2 == 0 ? number+1 : number;
 	while (1) {
-		if (isPrime_2(number) == 1){
+		if (isPrime(number) == 1){
 			writeLong(number);
 		}
-		number += 2;
+		number += 1;
+		button_2();
+		blink_2();
 	}
 }
 
@@ -240,10 +241,20 @@ int main(void)
     setupLCD();
 	setupCLK();
 	
-	//button();
-	//blink();
+	
+	//Del 1
 	//printPrim();
 	
+	
+	//Del 2
+	//blink();
+	
+	
+	//Del 3
+	//button();
+	
+	
+	//Del 4
 	concurrent();
 }
 
