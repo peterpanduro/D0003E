@@ -22,7 +22,7 @@ void writeChar(char ch, uint16_t position) {
 	d4 += position/2;
 	
 	//Blank position of the new number. This depends on the nibbles and position.
-	*d1 &= (0xf<<shift2);
+	*d1 &= (0xf<<shift2) | (0x6<<shift);
 	*d2 &= (0xf<<shift2);
 	*d3 &= (0xf<<shift2);
 	*d4 &= (0xf<<shift2);
@@ -111,15 +111,11 @@ void setupLCD(void) {
 	LCDCCR = 0x0f;
 }
 
-int pp;
-mutex *m;
+//mutex *m;
 void printAt(long num, int pos) {
-	lock(&m);
-    pp = pos;
-    writeChar( (num % 100) / 10 + '0', pp);
-    pp++;
-    writeChar( num % 10 + '0', pp);
-	unlock(&m);
+    writeChar( (num % 100) / 10 + '0', pos);
+    pos++;
+    writeChar( num % 10 + '0', pos);
 }
 
 void computePrimes(int pos) {
@@ -133,8 +129,47 @@ void computePrimes(int pos) {
     }
 }
 
+int blink(int i){
+ 		if (i) {
+			LCDDR0 &= 0xdd;
+			LCDDR1 &= 0xbb;
+			return 0;
+			} else {
+			LCDDR0 |= 0x22;
+			LCDDR1 |= 0x44;
+			return 1;
+		}
+}
+
+void button(void){
+	if ((LCDDR0 >> 6) & 1U) {
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x04;
+	} else  {
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x40;
+	}
+}
+
+void blinkAndButton(int pos){
+	int i = 0;
+	int timesPressedDown = -1;
+	while(1){
+		if (hasHalfASecondPassed()){
+			i = blink(i);
+		}
+		
+		if (timesPressedDown<getTimesPressedDown()){
+			timesPressedDown = getTimesPressedDown();
+			printAt(timesPressedDown,pos);
+			button();
+		}
+		
+	}
+}
+
 int main() {
 	setupLCD();
     spawn(computePrimes, 0);
-    computePrimes(3);
+    blinkAndButton(3);
 }
