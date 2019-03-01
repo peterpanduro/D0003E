@@ -46,8 +46,8 @@ static void initialize(void) {
 	TCCR1B |= (1<<WGM12); // CTC
 	TCCR1B |= (1<<CS12) | (1<<CS10); // 1024 prescaling
 	// OCRnA = (fclk_io / 2*N*fOCnA) - 1 = 8*10^6/(2*1024*200) = 194,3125 ~ 0xc2
-	// OCR1AH = 0x00; //OCR1A[15:8]
-	OCR1AL = 0xc2; //OCR1A[7:0]
+	OCR1AH = 0x01; //OCR1A[15:8]
+	OCR1AL = 0x86; //OCR1A[7:0]
 	//OCR1A=0x07a0;
 	TIMSK1 |= (1<<OCIE1A); //Output Compare A Match Interrupt Enable
 	//Reset CLK
@@ -152,9 +152,9 @@ int getTimesPressedDown(void){
 }
 
 ISR(PCINT1_vect) {
-	if (!((PINB >> 7) & 1U)) {
-		timesPressedDown++;
-	}
+// 	if (!((PINB >> 7) & 1U)) {
+// 		timesPressedDown++;
+// 	}
 }
 
 ISR(TIMER1_COMPA_vect) {

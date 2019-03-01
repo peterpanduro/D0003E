@@ -173,7 +173,7 @@ void button(int pos){
 }
 
 ISR(PCINT1_vect) {
-	if (!((PINB >> 7) == 1)) {
+	if (!((PINB >> 7) & 1U)) {
 		timesPressedDown++;
 		spawn(button, 4);
 		yield();

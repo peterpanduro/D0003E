@@ -178,7 +178,9 @@ void button(int pos){
 	
 	mutexButton->locked = 0;
 	mutexButton->waitQ = 0;
-	
+	printAt(timesPressedDown,pos);
+	LCDDR0 &= 0xbb;
+	LCDDR0 |= 0x40;
 	while (1) {		
 		lock(&mutexButton);
 		printAt(timesPressedDown,pos);
@@ -194,7 +196,7 @@ void button(int pos){
 
 
 ISR(PCINT1_vect) {
-	if (!((PINB >> 7) & 1U)) {
+	if (!((PINB >> PINB7) & 1U)) {
 		timesPressedDown++;
 		unlock(&mutexButton);
 	}

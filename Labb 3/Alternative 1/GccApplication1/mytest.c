@@ -132,7 +132,7 @@ void computePrimes(int pos) {
 //Make the lines switch on the display.
 void blink(void){
 	while(1){
-		if (resetNumberOfSwitchesAt(20)){//20 * 0,05 ms = 1 s
+		if (resetNumberOfSwitchesAt(10)){//10 * 0,05 ms = 0,5 s
 			if ((LCDDR0 >> 1) & 1U) {
 				LCDDR0 &= 0xdd;
 				LCDDR1 &= 0xbb;
@@ -144,11 +144,14 @@ void blink(void){
 	}
 }
 
+
 void button(int pos){
 	int timesPressedDown = -1;
+	int buttonIsPressed = 0;
+	int i = 0;
 	while(1){
-		if (timesPressedDown<getTimesPressedDown()){
-			timesPressedDown = getTimesPressedDown();
+		if (timesPressedDown<i){
+			timesPressedDown = i;
 			printAt(timesPressedDown,pos);
 			if ((LCDDR0 >> 6) & 1U) {
 				LCDDR0 &= 0xbb;
@@ -157,6 +160,14 @@ void button(int pos){
 				LCDDR0 &= 0xbb;
 				LCDDR0 |= 0x40;
 			}
+		}
+		if (!((PINB >> 7) & 1U)) {
+			if (!buttonIsPressed) {
+				i++;
+			}
+			buttonIsPressed = 1;
+		} else {
+			buttonIsPressed = 0;
 		}
 	}
 }
