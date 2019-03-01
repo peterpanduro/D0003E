@@ -1,11 +1,8 @@
 #include "tinythreads.h"
 #include "mytest.h"
 #include <avr/io.h>
-#include <inttypes.h>
 #include <avr/interrupt.h>
-
-mutex *mutexButton;
-mutex *mutexBlink;
+#include <inttypes.h>
 
 int timesPressedDown = 0;
 
@@ -137,7 +134,6 @@ void setupSettings(void) {
 	CLKPR = 0x00;
 }
 
-//mutex *m;
 void printAt(long num, int pos) {
     writeChar( (num % 100) / 10 + '0', pos);
     pos++;
@@ -154,66 +150,48 @@ void computePrimes(int pos) {
     }
 }
 
-
 //Make the lines switch on the display.
 void blink(int i){
-	
-	mutexBlink->locked = 0;
-	mutexBlink->waitQ = 0;
-	
-	while(1){
-		lock(&mutexBlink);
-		if ((LCDDR0 >> 1) & 1U) {
-			LCDDR0 &= 0xdd;
-			LCDDR1 &= 0xbb;
-		} else {
-			LCDDR0 |= 0x22;
-			LCDDR1 |= 0x44;
-		}
+	if ((LCDDR0 >> 1) & 1U) {
+		LCDDR0 &= 0xdd;
+		LCDDR1 &= 0xbb;
+	} else {
+		LCDDR0 |= 0x22;
+		LCDDR1 |= 0x44;
 	}
 }
-
 
 void button(int pos){
-	
-	mutexButton->locked = 0;
-	mutexButton->waitQ = 0;
-	
-	while (1) {		
-		lock(&mutexButton);
-		printAt(timesPressedDown,pos);
-		if ((LCDDR0 >> 6) & 1U) {
-			LCDDR0 &= 0xbb;
-			LCDDR0 |= 0x04;
-		} else  {
-			LCDDR0 &= 0xbb;
-			LCDDR0 |= 0x40;
-		}
+	printAt(timesPressedDown,pos);
+	if ((LCDDR0 >> 6) & 1U) {
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x04;
+	} else  {
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x40;
 	}
 }
-
 
 ISR(PCINT1_vect) {
-	if (!((PINB >> 7) & 1U)) {
+	if (!((PINB >> 7) == 1)) {
 		timesPressedDown++;
-		unlock(&mutexButton);
+		spawn(button, 4);
+		yield();
 	}
 }
 
-
-
-
 ISR(TIMER1_COMPA_vect) {
-	unlock(&mutexBlink);
+	spawn(blink, 0);
+	yield();
 }
 
 int main() {
 	setupSettings();
-	
+	DISABLE();
 	spawn(blink, 0);
 	yield();
- 	spawn(button, 4);
- 	yield();
-	
+	spawn(button, 4);
+	yield();
+	ENABLE();
 	computePrimes(0);
 }

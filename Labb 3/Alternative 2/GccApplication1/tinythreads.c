@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "tinythreads.h"
+#include "mytest.h"
 
 #define NULL            0
 #define DISABLE()       cli()
@@ -27,33 +28,13 @@ thread readyQ  = NULL;
 thread current = &initp;
 
 int initialized = 0;
-int numberOfSwitches = 0;
-int timesPressedDown = 0;
+int test = 0;
 
 static void initialize(void) {
 	int i;
 	for (i=0; i<NTHREADS-1; i++)
 	threads[i].next = &threads[i+1];
 	threads[NTHREADS-1].next = NULL;
-
-	// Enable logical interrupt for joystick down. Source PCINT15 (7th bit on PORTB)
-	PORTB = 0x80 | PORTB;
-	PCMSK1 = 0x80 | PCMSK1;
-	EIMSK |= (1<<PCIE1);
-	
-	// Enable timer interrupt at 50 ms interval
-	TCCR1A |= (1<<COM1A0); // OC1A Compare Match
-	TCCR1B |= (1<<WGM12); // CTC
-	TCCR1B |= (1<<CS12) | (1<<CS10); // 1024 prescaling
-	// OCRnA = (fclk_io / 2*N*fOCnA) - 1 = 8*10^6/(2*1024*200) = 194,3125 ~ 0xc2
-	// OCR1AH = 0x00; //OCR1A[15:8]
-	OCR1AL = 0xc2; //OCR1A[7:0]
-	//OCR1A=0x07a0;
-	TIMSK1 |= (1<<OCIE1A); //Output Compare A Match Interrupt Enable
-	//Reset CLK
-	CLKPR = 0x80;
-	CLKPR = 0x00;
-
 	initialized = 1;
 }
 
@@ -63,9 +44,9 @@ static void enqueue(thread p, thread *queue) {
 		*queue = p;
 		} else {
 		thread q = *queue;
-		while (q->next)
-		q = q->next;
-		q->next = p;
+		
+		p->next = q;
+		q = p;
 	}
 }
 
@@ -73,12 +54,18 @@ static thread dequeue(thread *queue) {
 	thread p = *queue;
 	if (*queue) {
 		*queue = (*queue)->next;
-		} else {
+	} else {
+		if (test){
+			LCDDR3=0xff;
+		}else{
+			LCDDR8=0xff;
+		}
 		// Empty queue, kernel panic!!!
 		while (1) ;  // not much else to do...
 	}
 	return p;
 }
+
 
 static void dispatch(thread next) {
 	if (setjmp(current->context) == 0) {
@@ -112,8 +99,9 @@ void spawn(void (* function)(int), int arg) {
 
 void yield(void) {
 	DISABLE();
+	thread p = dequeue(&readyQ);
 	enqueue(current, &readyQ);
-	dispatch(dequeue(&readyQ));
+	dispatch(p);
 	ENABLE();
 }
 
@@ -122,44 +110,24 @@ void lock(mutex *m) {
 	if (m->locked) {
 		enqueue(current, &m->waitQ);
 		dispatch(dequeue(&readyQ));
-		} else {
+	} else {
 		m->locked=1;
 	}
 	ENABLE();
 }
 
 void unlock(mutex *m) {
-	DISABLE();
+//	printAt(m->waitQ, 2);
 	if (m->waitQ) {
-		enqueue(current, &readyQ);
-		dispatch(dequeue(&m->waitQ));
-		} else {
-		m->locked = 0;
+ 		enqueue(current, &readyQ);
+		thread t = dequeue(&m->waitQ);
+		test = 1;
+ 		dispatch(t);// CRASH
+		 test = 0;
+	} else {
+// 		m->locked = 0;
 	}
-	ENABLE();
 }
 
-int resetNumberOfSwitchesAt(int i){
-	if (numberOfSwitches > i){
-		numberOfSwitches = 0;
-		return 1;
-	}
-	return 0;
-}
 
-int getTimesPressedDown(void){
-	return timesPressedDown;
-}
 
-ISR(PCINT1_vect) {
-	DISABLE();
-	if (!((PINB >> 7) & 1U)) {
-		timesPressedDown++;
-	}
-	ENABLE();
-}
-
-ISR(TIMER1_COMPA_vect) {
-	numberOfSwitches++;
-	yield();
-}
