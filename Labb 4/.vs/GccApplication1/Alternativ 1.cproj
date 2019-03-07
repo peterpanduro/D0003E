@@ -12,9 +12,9 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>Part 3</AssemblyName>
-    <Name>Part 3</Name>
-    <RootNamespace>Part 3</RootNamespace>
+    <AssemblyName>GccApplication1</AssemblyName>
+    <Name>Alternativ 1</Name>
+    <RootNamespace>GccApplication1</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -136,9 +136,6 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="mytest.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="mytest.c">
       <SubType>compile</SubType>
     </Compile>

@@ -1,13 +1,6 @@
 #include "tinythreads.h"
-#include "mytest.h"
 #include <avr/io.h>
 #include <inttypes.h>
-#include <avr/interrupt.h>
-
-mutex *mutexButton;
-mutex *mutexBlink;
-
-int timesPressedDown = 0;
 
 void writeChar(char ch, uint16_t position) {
 	if (position > 5) {
@@ -103,8 +96,7 @@ int is_prime(long number) {
 	return 1;
 }
 
-void setupSettings(void) {
-	
+void setupLCD(void) {
 	// Enable. Low power wave form.
 	//LCDCRA = (1<<LCDEN) | (1<<LCDAB);
 	LCDCRA = 0xc0;
@@ -117,24 +109,6 @@ void setupSettings(void) {
 	// Drive time 300?s. Contrast 3,35V
 	//LCDCCR = (1<<LCDCC3) | (1<<LCDCC2) | (1<<LCDCC1) | (1<<LCDCC0);
 	LCDCCR = 0x0f;
-	
-	// Enable logical interrupt for joystick down. Source PCINT15 (7th bit on PORTB)
-	PORTB = 0x80 | PORTB;
-	PCMSK1 = 0x80 | PCMSK1;
-	EIMSK |= (1<<PCIE1);
-	
-	// Enable timer interrupt at 50 ms interval
-	TCCR1A |= (1<<COM1A0); // OC1A Compare Match
-	TCCR1B |= (1<<WGM12); // CTC
-	TCCR1B |= (1<<CS12) | (1<<CS10); // 1024 prescaling
-	// OCRnA = (fclk_io / 2*N*fOCnA) - 1 = 8*10^6/(2*1024*200) = 194,3125 ~ 0xc2
-	OCR1AH = 0x0f; //OCR1A[15:8]
-	OCR1AL = 0x2e; //OCR1A[7:0]
-	//OCR1A=0x07a0;
-	TIMSK1 |= (1<<OCIE1A); //Output Compare A Match Interrupt Enable
-	//Reset CLK
-	CLKPR = 0x80;
-	CLKPR = 0x00;
 }
 
 //mutex *m;
@@ -150,72 +124,52 @@ void computePrimes(int pos) {
     for(n = 1; ; n++) {
         if (is_prime(n)) {
             printAt(n, pos);
+			//yield();
         }
     }
 }
 
-
-//Make the lines switch on the display.
-void blink(int i){
-	
-	mutexBlink->locked = 1;
-	mutexBlink->waitQ = 0;
-	
-	while(1){
-		lock(&mutexBlink);
-		if ((LCDDR0 >> 1) & 1U) {
+int blink(int i){
+ 		if (i) {
 			LCDDR0 &= 0xdd;
 			LCDDR1 &= 0xbb;
-		} else {
+			return 0;
+			} else {
 			LCDDR0 |= 0x22;
 			LCDDR1 |= 0x44;
+			return 1;
 		}
+}
+
+void button(void){
+	if ((LCDDR0 >> 6) & 1U) {
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x04;
+	} else  {
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x40;
 	}
 }
 
-
-void button(int pos){
-	
-	mutexButton->locked = 1;
-	mutexButton->waitQ = 0;
-	printAt(timesPressedDown,pos);
-	LCDDR0 &= 0xbb;
-	LCDDR0 |= 0x40;
-	while (1) {		
-		lock(&mutexButton);
-		printAt(timesPressedDown,pos);
-		if ((LCDDR0 >> 6) & 1U) {
-			LCDDR0 &= 0xbb;
-			LCDDR0 |= 0x04;
-		} else  {
-			LCDDR0 &= 0xbb;
-			LCDDR0 |= 0x40;
+void blinkAndButton(int pos){
+	int i = 0;
+	int timesPressedDown = -1;
+	while(1){
+		if (hasHalfASecondPassed()){
+			i = blink(i);
 		}
+		
+		if (timesPressedDown<getTimesPressedDown()){
+			timesPressedDown = getTimesPressedDown();
+			printAt(timesPressedDown,pos);
+			button();
+		}
+		
 	}
-}
-
-
-ISR(PCINT1_vect) {
-	if (!((PINB >> PINB7) & 1U)) {
-		timesPressedDown++;
-		unlock(&mutexButton);
-	}
-}
-
-
-
-
-ISR(TIMER1_COMPA_vect) {
-	unlock(&mutexBlink);
 }
 
 int main() {
-	setupSettings();
-	
-	spawn(blink, 0);
-	yield();
- 	spawn(button, 4);
- 	yield();
-	
-	computePrimes(0);
+	setupLCD();
+    spawn(computePrimes, 0);
+    blinkAndButton(3);
 }

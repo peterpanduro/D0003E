@@ -13,7 +13,7 @@
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
     <AssemblyName>GccApplication1</AssemblyName>
-    <Name>Labb4</Name>
+    <Name>Labb 4</Name>
     <RootNamespace>GccApplication1</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
@@ -28,22 +28,6 @@
     <ResetRule>0</ResetRule>
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <EraseKey />
-    <avrtool>com.atmel.avrdbg.tool.ispmk2</avrtool>
-    <avrtoolserialnumber>195051278134</avrtoolserialnumber>
-    <avrdeviceexpectedsignature>0x1E9405</avrdeviceexpectedsignature>
-    <avrtoolinterface>ISP</avrtoolinterface>
-    <avrtoolinterfaceclock>125000</avrtoolinterfaceclock>
-    <com_atmel_avrdbg_tool_ispmk2>
-      <ToolOptions>
-        <InterfaceProperties>
-          <IspClock>125000</IspClock>
-        </InterfaceProperties>
-        <InterfaceName>ISP</InterfaceName>
-      </ToolOptions>
-      <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
-      <ToolNumber>195051278134</ToolNumber>
-      <ToolName>AVRISP mkII</ToolName>
-    </com_atmel_avrdbg_tool_ispmk2>
     <AsfFrameworkConfig>
       <framework-data xmlns="">
         <options />
@@ -56,6 +40,22 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.ispmk2</avrtool>
+    <avrtoolserialnumber>000200048918</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x1E9405</avrdeviceexpectedsignature>
+    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterfaceclock>125000</avrtoolinterfaceclock>
+    <com_atmel_avrdbg_tool_ispmk2>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.ispmk2</ToolType>
+      <ToolNumber>000200048918</ToolNumber>
+      <ToolName>AVRISP mkII</ToolName>
+    </com_atmel_avrdbg_tool_ispmk2>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -136,7 +136,16 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="main.c">
+    <Compile Include="mytest.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="mytest.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tinythreads.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tinythreads.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
