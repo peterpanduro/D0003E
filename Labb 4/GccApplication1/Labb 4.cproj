@@ -136,16 +136,25 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="mytest.c">
+    <Compile Include="Display.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="mytest.h">
+    <Compile Include="Display.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="tinythreads.c">
+    <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="tinythreads.h">
+    <Compile Include="Pulse.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Pulse.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TinyTimber.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TinyTimber.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
