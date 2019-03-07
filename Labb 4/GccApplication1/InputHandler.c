@@ -23,7 +23,7 @@ inputRecieved() {
 		printAt(4, 1);
 	}
 	
-	if (!((PINE >> PCINT3) & 1U)) {
+	if (!((PINE >> PCINT3) & 1U)) {//right
 		printAt(5, 1);
 	}
 }
