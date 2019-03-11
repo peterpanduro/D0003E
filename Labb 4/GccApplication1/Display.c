@@ -4,24 +4,10 @@
 #include <math.h>
 #include <stdint.h>
 
-void setupLCD(void) {
-	// Enable. Low power wave form.
-	//LCDCRA = (1<<LCDEN) | (1<<LCDAB);
-	LCDCRA = 0xc0;
-	// External clock. 1/4 Duty. 25 segments port mask
-	//LCDCRB = (1<<LCDCS) | (1<<LCDMUX1) | (1<<LCDMUX0) | (1<<LCDPM2) | (1<<LCDPM1) | (1<<LCDPM0);
-	LCDCRB = 0xb7;
-	// Frame rate
-	//LCDFRR = (1<<LCDCD2) | (1<<LCDCD1) | (1<<LCDCD0);
-	LCDFRR = 0x06;
-	// Drive time 300?s. Contrast 3,35V
-	//LCDCCR = (1<<LCDCC3) | (1<<LCDCC2) | (1<<LCDCC1) | (1<<LCDCC0);
-	LCDCCR = 0x0f;
-}
-
-void writeChar(char ch, uint16_t position) {
+int writeChar(Display *self, char ch) {
+	uint16_t position = self->displayPos;
 	if (position > 5) {
-		return;
+		return 0;
 	}
 	int shift = position%2 ? 4 : 0; //If position is an even number its the UPPER nibbles that changes AKA shift left 4
 	//and use OR in the new bits
@@ -102,12 +88,18 @@ void writeChar(char ch, uint16_t position) {
 		default:
 		break;
 	}
+	return 0;
 }
 
-void printAt(long num, int pos) {
-	writeChar( (num % 100) / 10 + '0', pos);
-	pos++;
-	writeChar( num % 10 + '0', pos);
+
+/*void printAt(long num, int pos) */
+int printNumber(Display *self, int arg){
+	long num = arg;
+	SYNC(self, writeChar, (num % 100) / 10 + '0');
+	self->displayPos = self->displayPos + 1;
+	SYNC(self, writeChar, num % 10 + '0');
+	self->displayPos = self->displayPos - 1;
+	return 0;
 }
 
 void setDisplay(Pulse *pulse, int counterId) {

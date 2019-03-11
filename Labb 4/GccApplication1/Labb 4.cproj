@@ -157,6 +157,12 @@
     <Compile Include="Pulse.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Run.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Run.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="TinyTimber.c">
       <SubType>compile</SubType>
     </Compile>

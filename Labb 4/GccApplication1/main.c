@@ -6,6 +6,9 @@
  */ 
 
 #include "InputHandler.h"
+#include "Display.h"
+#include "TinyTimber.h"
+#include "Run.h"
 
 #include <avr/io.h>
 #include <math.h>
@@ -30,7 +33,8 @@ void setupSettings(void) {
 	PORTB = 0xff | PORTB;
 	PORTE |=  (1<<PCINT2) | (1<<PCINT3);
 	PCMSK1 = 0xff | PCMSK1;
-	EIMSK |= (1<<PCIE1);
+	PCMSK0 |= (1<<PCINT2) | (1<<PCINT3);
+	EIMSK |= (1<<PCIE1) | (1<<PCIE0);
 	
 	// Enable timer interrupt at 50 ms interval
 	TCCR1A |= (1<<COM1A0); // OC1A Compare Match
@@ -42,8 +46,8 @@ void setupSettings(void) {
 	//OCR1A=0x07a0;
 	TIMSK1 |= (1<<OCIE1A); //Output Compare A Match Interrupt Enable
 	//Reset CLK
-	CLKPR = 0x80;
-	CLKPR = 0x00;
+// 	CLKPR = 0x80;
+// 	CLKPR = 0x00;
 }
 
 void setupCLK(void) {
@@ -57,11 +61,18 @@ int main(void)
 {
 	setupSettings();
 	
-	PORTE |= (1<<PCINT6);
-	PORTE |= (1<<PCINT4);
+// 	PORTE |= (1<<PCINT6);
+// 	PORTE |= (1<<PCINT4);
 	
-	while(1){
-	inputRecieved();
-	}
+	Display display = initDisplay(0);
+	Display display2 = initDisplay(3);
+	InputHandler input = initInputHandler(&display,&display2);
+	/*Run run = initRun();*/
+	
+	
+	
+	INSTALL(&input,inputRecieved,IRQ_PCINT1);
+	INSTALL(&input,inputRecieved,IRQ_PCINT0);
+	return TINYTIMBER(NULL, NULL, NULL);
 }
 
