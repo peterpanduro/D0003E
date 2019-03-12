@@ -14,19 +14,19 @@ int inputRecieved(InputHandler *self, int arg) {
 	
 	if (!((PINB >> PINB4) & 1U)) {//enter
 		LCDDR3 |= 0xff;
-		ASYNC(&pulse, switchValue, 0);
+		ASYNC(pulse, switchValue, 0);
 	}
 	
 	if (!((PINB >> PINB6) & 1U)) {//up
 		i = 2;
 		LCDDR3 |= 0xff;
-		ASYNC(&pulse, increseValue, 0);
+		ASYNC(pulse, increseValue, 0);
 	}
 	
 	if (!((PINB >> PINB7) & 1U)) {//down
 		i = 3;
 		LCDDR3 |= 0xff;
-		ASYNC(&pulse, lowerValue, 0);
+		ASYNC(pulse, lowerValue, 0);
 	}
 	
 	if (!((PINE >> PCINT2) & 1U)) {//left
@@ -34,6 +34,7 @@ int inputRecieved(InputHandler *self, int arg) {
 		self->currentPulse = self->nextPulse;
 		self->nextPulse = pulse;
 		pulse = self->currentPulse;
+		ASYNC(self->currentPulse, togglePulse, 0);
 	}
 	
 	if (!((PINE >> PCINT3) & 1U)) {//right
@@ -41,11 +42,16 @@ int inputRecieved(InputHandler *self, int arg) {
 		self->currentPulse = self->nextPulse;
 		self->nextPulse = pulse;
 		pulse = self->currentPulse;
+		ASYNC(self->currentPulse, togglePulse, 0);
 	}
  	
 	if (i == 2 || i == 3){
- 		//Do something?
+		/*AFTER(*self,1);*/
 	}
 	return 0;
-	
+}
+
+int buttonStillPressed(InputHandler *self, int arg){
+	//Do something
+	return 0;
 }

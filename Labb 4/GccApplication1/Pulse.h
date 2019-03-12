@@ -7,7 +7,7 @@
 
 typedef struct {
 	Object super;
-	Display display;
+	Display *display;
 	int id; // Id 1 == 100, Id 2 == 200.
 	int value;
 	int storedValue;
@@ -18,6 +18,7 @@ typedef struct {
 int	switchValue(Pulse *self, int arg);  //Changes the value to the stored value
 int increseValue(Pulse *self, int arg); //Increases value by one
 int lowerValue(Pulse *self, int arg);   //Lowers value by one
+int togglePulse(Pulse *self, int arg); //Toggles between 1 and 2 on the display.
 int runPulse(Pulse *self, int arg);		//Changes the current from low to high and queue it self.
 
 #endif

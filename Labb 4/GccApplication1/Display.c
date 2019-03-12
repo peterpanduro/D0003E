@@ -101,7 +101,7 @@ int printNumber(Display *self, int arg){
 	}else if (num/100 == 2){
 		pos = 3;
 	}else{
-		LCDDR0 |= 0xff;//If this happens something wrong happend in pulse with the Id.
+		LCDDR0 |= 0xff;//If this happens something wrong happened in pulse with the Id.
 		pos = 2;
 	}
 	
@@ -111,7 +111,15 @@ int printNumber(Display *self, int arg){
 	return 0;
 }
 
-int changePulseSate(Display *pulse, int arg) {
+int toggle(Display *pulse, int arg) {
+	
+	if (arg == 100){
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x04;
+	}else{
+		LCDDR0 &= 0xbb;
+		LCDDR0 |= 0x40;
+	}
 	
 	return 0;
 }

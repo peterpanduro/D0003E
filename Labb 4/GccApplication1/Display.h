@@ -13,7 +13,7 @@ typedef struct {
 
 #define initDisplay(displayPos1, displayPos2) {initObject(),displayPos1, displayPos2}
 
-int changePulseSate(Display *self, int arg);
-int printNumber(Display *self, int arg);
+int toggle(Display *self, int arg);	//change and shows witch pulse is active
+int printNumber(Display *self, int arg);	//Prints wanted number according to Id.
 
 #endif

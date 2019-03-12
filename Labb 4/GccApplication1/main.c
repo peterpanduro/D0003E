@@ -66,12 +66,12 @@ int main(void)
 // 	PORTE |= (1<<PCINT4);
 	
 	Display display = initDisplay( 0, 3);
-	Pulse pulse1 = initPulse( display, 1);
-	Pulse pulse2 = initPulse( display, 2);
+	Pulse pulse1 = initPulse( &display, 1);
+	Pulse pulse2 = initPulse( &display, 2);
 	InputHandler input = initInputHandler( &pulse1, &pulse2);
 	
 	INSTALL(&input,inputRecieved,IRQ_PCINT1);
-	INSTALL(&input,inputRecieved,IRQ_PCINT0);
+	INSTALL(&input,inputRecieved,IRQ_PCINT0);			//<------------------------------------------------ Left and right interrupts are disabled.
 	return TINYTIMBER(NULL,NULL,NULL);
 }
 
