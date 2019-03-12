@@ -1,12 +1,18 @@
 /*
  * Run.c
  *
- * Created: 2019-03-11 16:54:52
+ * Created: 2019-03-12 18:05:21
  *  Author: jonjac-6
  */ 
 
-void coolFunction(){
-	int cool = (1 == 1) ? 1 : 0;
-	while(cool);
-}
+#include "Run.h"
 
+int startupSequence(Run *self, int arg){
+	ASYNC(self->pulse1, switchValue, 0);
+	ASYNC(self->pulse2, switchValue, 0);
+	ASYNC(self->pulse1, togglePulse, 0);
+	ASYNC(self->pulse1, runPulse, 0);
+	ASYNC(self->pulse2, runPulse, 0);
+	
+	return 0;
+}

@@ -136,6 +136,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Run.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Display.c">
       <SubType>compile</SubType>
     </Compile>
@@ -157,7 +160,10 @@
     <Compile Include="Pulse.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Run.c">
+    <Compile Include="HoldButton.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="HoldButton.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Run.h">

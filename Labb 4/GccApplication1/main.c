@@ -9,6 +9,7 @@
 #include "Pulse.h"
 #include "Display.h"
 #include "TinyTimber.h"
+#include "HoldButton.h"
 #include "Run.h"
 
 #include <avr/io.h>
@@ -68,10 +69,12 @@ int main(void)
 	Display display = initDisplay( 0, 3);
 	Pulse pulse1 = initPulse( &display, 1);
 	Pulse pulse2 = initPulse( &display, 2);
-	InputHandler input = initInputHandler( &pulse1, &pulse2);
+	HoldButton holdButton = initHoldButton( &pulse1, &pulse2);
+	InputHandler input = initInputHandler( &pulse1, &pulse2, &holdButton);
+	Run start = initRun( &pulse1, &pulse2);
 	
-	INSTALL(&input,inputRecieved,IRQ_PCINT1);
-	INSTALL(&input,inputRecieved,IRQ_PCINT0);			//<------------------------------------------------ Left and right interrupts are disabled.
-	return TINYTIMBER(NULL,NULL,NULL);
+	INSTALL(&input,inputRecieved,IRQ_PCINT1); //Up, down and enter.
+	INSTALL(&input,inputRecieved,IRQ_PCINT0); //Left and right.
+	return TINYTIMBER(&start, startupSequence, 0);
 }
 

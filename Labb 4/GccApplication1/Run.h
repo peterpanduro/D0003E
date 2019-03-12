@@ -1,7 +1,7 @@
 /*
  * Run.h
  *
- * Created: 2019-03-11 16:55:06
+ * Created: 2019-03-12 18:05:52
  *  Author: jonjac-6
  */ 
 
@@ -9,15 +9,18 @@
 #ifndef _RUN_
 #define _RUN_
 
-#include "Pulse.h"
 #include "TinyTimber.h"
+#include "Pulse.h"
 
-typedef struct {
+typedef struct{
 	Object super;
+	Pulse *pulse1;
+	Pulse *pulse2;
 } Run;
 
-#define initRun() {initObject()}
+#define initRun( pulse1, pulse2) {initObject(), pulse1, pulse2}
 
-void coolFunction(Run *self, int arg);
+int startupSequence(Run *self, int arg);
+
 
 #endif

@@ -48,24 +48,23 @@ int togglePulse(Pulse *self, int arg){
 }
 
 int runPulse(Pulse *self, int arg){		//Changes the current from low to high and queue it self.
+
+
 	if (self->id == 100){
 		if ((PORTE >> PE6) & 1U){
-			PORTE &= (1 << PE6);
+			PORTE &= 0xbf;
 		}else{
-			PORTE |= (1 << PE6);
-		}		//Can be wrong<------------------------------------------------------------------------------------------------------------------------
+			PORTE |= 0x40;
+		}
 	}else if (self->id == 200){
 		if ((PORTE >> PE4) & 1U){
-			PORTE &= (1 << PE4);
+			PORTE &= 0xef;
 			}else{
-			PORTE |= (1 << PE4);
-		}		//Can be wrong<------------------------------------------------------------------------------------------------------------------------
+			PORTE |= 0x10;
+		}
 	}
 	
-	Display *dis = self->display;
-	
-	SYNC(dis, printNumber, self->id + self->value);
-	
-	AFTER(MSEC(self->value), self, runPulse, arg);
+	int i = ((100 - self->value) * 8) + 50;
+	AFTER(MSEC(i), self, runPulse, 0);
 	return 0;
 }

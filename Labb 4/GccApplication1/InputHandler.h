@@ -4,14 +4,16 @@
 
 #include "TinyTimber.h"
 #include "Pulse.h"
+#include "HoldButton.h"
 
 typedef struct {
 	Object super;
 	Pulse *currentPulse;
 	Pulse *nextPulse;
+	HoldButton *holdButton;
 } InputHandler;
 
-#define  initInputHandler(currentPulse,nextPulse) {initObject(),currentPulse,nextPulse}
+#define  initInputHandler(currentPulse, nextPulse, holdButton) {initObject(), currentPulse, nextPulse, holdButton}
 
 int inputRecieved(InputHandler *self, int arg);
 

@@ -21,4 +21,9 @@ int lowerValue(Pulse *self, int arg);   //Lowers value by one
 int togglePulse(Pulse *self, int arg); //Toggles between 1 and 2 on the display.
 int runPulse(Pulse *self, int arg);		//Changes the current from low to high and queue it self.
 
+int lowPulse1(Pulse *self, int arg);
+int lowPulse2(Pulse *self, int arg);
+int highPulse1(Pulse *self, int arg);
+int highPulse2(Pulse *self, int arg);
+
 #endif
