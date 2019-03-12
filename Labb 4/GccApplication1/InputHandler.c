@@ -6,50 +6,46 @@
 
 int inputRecieved(InputHandler *self, int arg) {
 	
-	Display *display = self->currentDisplay;
-	int i = 5;
-// 	LCDDR0 &= 0x00;
-// 	LCDDR1 &= 0x00;
-// 	LCDDR2 &= 0x00;
-// 	LCDDR3 &= 0x00;
-// 	LCDDR5 &= 0x00;
-// 	LCDDR6 &= 0x00;
+	Pulse *pulse = self->currentPulse;
+	int i = 0;
+	
+	LCDDR3 |= 0x00;
 	
 	
 	if (!((PINB >> PINB4) & 1U)) {//enter
-		/*i = 0;*/
 		LCDDR3 |= 0xff;
+		ASYNC(&pulse, switchValue, 0);
 	}
 	
 	if (!((PINB >> PINB6) & 1U)) {//up
-		/*i = 1;*/
+		i = 2;
 		LCDDR3 |= 0xff;
-		/*LCDDR2 |= 0xff;*/
+		ASYNC(&pulse, increseValue, 0);
 	}
 	
 	if (!((PINB >> PINB7) & 1U)) {//down
-		/*i = 2;*/
+		i = 3;
 		LCDDR3 |= 0xff;
-		/*LCDDR1 |= 0xff;*/
+		ASYNC(&pulse, lowerValue, 0);
 	}
 	
 	if (!((PINE >> PCINT2) & 1U)) {//left
-		/*i = 3;*/
 		LCDDR3 |= 0xff;
-// 		self->currentDisplay = self->nextDisplay;
-// 		self->nextDisplay = display;
-// 		display = self->currentDisplay;
+		self->currentPulse = self->nextPulse;
+		self->nextPulse = pulse;
+		pulse = self->currentPulse;
 	}
 	
 	if (!((PINE >> PCINT3) & 1U)) {//right
-		/*i = 4;*/
 		LCDDR3 |= 0xff;
-// 		self->currentDisplay = self->nextDisplay;
-// 		self->nextDisplay = display;
-// 		display = self->currentDisplay;
+		self->currentPulse = self->nextPulse;
+		self->nextPulse = pulse;
+		pulse = self->currentPulse;
 	}
  	
- 	ASYNC(display, writeChar, i + '0');
+	if (i == 2 || i == 3){
+ 		//Do something?
+	}
 	return 0;
 	
 }

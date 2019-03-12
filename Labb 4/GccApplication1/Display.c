@@ -4,8 +4,7 @@
 #include <math.h>
 #include <stdint.h>
 
-int writeChar(Display *self, char ch) {
-	uint16_t position = self->displayPos;
+int writeChar(char ch, int position) {
 	if (position > 5) {
 		return 0;
 	}
@@ -92,16 +91,27 @@ int writeChar(Display *self, char ch) {
 }
 
 
-/*void printAt(long num, int pos) */
-int printNumber(Display *self, int arg){
-	long num = arg;
-	SYNC(self, writeChar, (num % 100) / 10 + '0');
-	self->displayPos = self->displayPos + 1;
-	SYNC(self, writeChar, num % 10 + '0');
-	self->displayPos = self->displayPos - 1;
+//argument should have 3 digits between 100-299. The first digit decides if it is displayPos1 of displayPos2.
+int printNumber(Display *self, int arg){ 
+	int num = arg;
+	int pos;
+	
+	if (num/100 == 1){
+		pos = 0;
+	}else if (num/100 == 2){
+		pos = 3;
+	}else{
+		LCDDR0 |= 0xff;//If this happens something wrong happend in pulse with the Id.
+		pos = 2;
+	}
+	
+	writeChar( (num % 100) / 10 + '0', pos);
+	pos++;
+	writeChar( num % 10 + '0', pos);
 	return 0;
 }
 
-void setDisplay(Pulse *pulse, int counterId) {
+int changePulseSate(Display *pulse, int arg) {
 	
+	return 0;
 }

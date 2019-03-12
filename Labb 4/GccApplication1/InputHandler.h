@@ -3,15 +3,15 @@
 #define _INPUTHANDLER_
 
 #include "TinyTimber.h"
-#include "Display.h"
+#include "Pulse.h"
 
 typedef struct {
 	Object super;
-	Display *currentDisplay;
-	Display *nextDisplay;
+	Pulse *currentPulse;
+	Pulse *nextPulse;
 } InputHandler;
 
-#define  initInputHandler(currentDisplay,nextDisplay) {initObject(),currentDisplay,nextDisplay}
+#define  initInputHandler(currentPulse,nextPulse) {initObject(),currentPulse,nextPulse}
 
 int inputRecieved(InputHandler *self, int arg);
 

@@ -3,18 +3,17 @@
 #ifndef _DISPLAY_
 #define _DISPLAY_
 
-#include "Pulse.h"
 #include "TinyTimber.h"
 
 typedef struct {
 	Object super;
-	int displayPos;
+	int displayPos1;
+	int displayPos2;
 } Display;
 
-#define initDisplay(displayPos) {initObject(),displayPos}
+#define initDisplay(displayPos1, displayPos2) {initObject(),displayPos1, displayPos2}
 
-int setDisplayPos(Display *self, int arg);
+int changePulseSate(Display *self, int arg);
 int printNumber(Display *self, int arg);
-int writeChar(Display *self, char ch);
 
 #endif

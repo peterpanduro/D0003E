@@ -6,6 +6,7 @@
  */ 
 
 #include "InputHandler.h"
+#include "Pulse.h"
 #include "Display.h"
 #include "TinyTimber.h"
 #include "Run.h"
@@ -64,15 +65,13 @@ int main(void)
 // 	PORTE |= (1<<PCINT6);
 // 	PORTE |= (1<<PCINT4);
 	
-	Display display = initDisplay(0);
-	Display display2 = initDisplay(3);
-	InputHandler input = initInputHandler(&display,&display2);
-	/*Run run = initRun();*/
-	
-	
+	Display display = initDisplay( 0, 3);
+	Pulse pulse1 = initPulse( display, 1);
+	Pulse pulse2 = initPulse( display, 2);
+	InputHandler input = initInputHandler( &pulse1, &pulse2);
 	
 	INSTALL(&input,inputRecieved,IRQ_PCINT1);
 	INSTALL(&input,inputRecieved,IRQ_PCINT0);
-	return TINYTIMBER(NULL, NULL, NULL);
+	return TINYTIMBER(NULL,NULL,NULL);
 }
 
