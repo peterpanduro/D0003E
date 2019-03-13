@@ -48,8 +48,8 @@ void setupSettings(void) {
 	//OCR1A=0x07a0;
 	TIMSK1 |= (1<<OCIE1A); //Output Compare A Match Interrupt Enable
 	//Reset CLK
-// 	CLKPR = 0x80;
-// 	CLKPR = 0x00;
+	// 	CLKPR = 0x80;
+	// 	CLKPR = 0x00;
 }
 
 void setupCLK(void) {
@@ -66,7 +66,7 @@ int main(void)
 // 	PORTE |= (1<<PCINT6);
 // 	PORTE |= (1<<PCINT4);
 	
-	Display display = initDisplay( 0, 3);
+	Display display = initDisplay();
 	Pulse pulse1 = initPulse( &display, 1);
 	Pulse pulse2 = initPulse( &display, 2);
 	HoldButton holdButton = initHoldButton( &pulse1, &pulse2);

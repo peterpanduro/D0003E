@@ -9,7 +9,12 @@ int	switchValue(Pulse *self, int arg){  //Changes the value to the stored value
 	
  	int temp = self->storedValue;
  	self->storedValue = self->value;
- 	self->value = temp;
+	
+	if(self->storedValue != 0 && self->value != 0 ){
+		self->value = 0;
+	}else{
+		self->value = temp;
+	}
 	
 	SYNC(self->display, printNumber, self->id+self->value);
 	
@@ -51,20 +56,20 @@ int runPulse(Pulse *self, int arg){		//Changes the current from low to high and 
 
 
 	if (self->id == 100){
-		if ((PORTE >> PE6) & 1U){
+		if ((PORTE >> PE6) & 1U || self->value == 0){
 			PORTE &= 0xbf;
 		}else{
 			PORTE |= 0x40;
 		}
 	}else if (self->id == 200){
-		if ((PORTE >> PE4) & 1U){
+		if ((PORTE >> PE4) & 1U || self->value == 0){
 			PORTE &= 0xef;
 			}else{
 			PORTE |= 0x10;
 		}
 	}
 	
-	int i = ((100 - self->value) * 8) + 50;
+	int i = ((100 - self->value) * 8);
 	AFTER(MSEC(i), self, runPulse, 0);
 	return 0;
 }

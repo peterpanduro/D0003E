@@ -111,7 +111,7 @@ int printNumber(Display *self, int arg){
 	return 0;
 }
 
-int toggle(Display *pulse, int arg) {
+int toggle(Display *self, int arg) {
 	
 	if (arg == 100){
 		LCDDR0 &= 0xbb;
