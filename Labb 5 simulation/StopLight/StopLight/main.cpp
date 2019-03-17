@@ -4,6 +4,7 @@
 #include "pch.h"
 #include <iostream>
 #include "StopLight.h"
+#include <windows.h>
 
 int main()
 {
@@ -11,6 +12,30 @@ int main()
 
 	light.printStopLight();
 
+	while (1) {
+		while (1) {
+			if (GetAsyncKeyState('S') & 0x8000) {
+				light.addToQ(2);
+				light.printStopLight();
+				while (GetAsyncKeyState('S') & 0x8000);
+			}
+			if (GetAsyncKeyState('N') & 0x8000) {
+				light.addToQ(1);
+				light.printStopLight();
+				while (GetAsyncKeyState('N') & 0x8000);
+			}
+			if (GetAsyncKeyState('T') & 0x8000) {
+				light.toggleLight(1);
+				light.printStopLight();
+				while (GetAsyncKeyState('T') & 0x8000);
+			}
+			if (GetAsyncKeyState('Y') & 0x8000) {
+				light.toggleLight(2);
+				light.printStopLight();
+				while (GetAsyncKeyState('Y') & 0x8000);
+			}
+		}
+	}
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

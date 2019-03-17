@@ -16,6 +16,8 @@ public:
 	StopLight(void);
 
 	void printStopLight();
+	void addToQ(int i);
+	void toggleLight(int i);
 };
 
 
