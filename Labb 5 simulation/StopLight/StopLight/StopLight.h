@@ -2,8 +2,10 @@
 class StopLight{
 
 private:
-	bool redNorthenLight;
-	bool redSouthernLight;
+	bool redNorthenLightOn = true;
+	bool redSouthernLightOn = true;
+	bool hasBeenUpdated = true;
+	bool startUp = true;
 	int carsInNorhtenQ;
 	int carsInSouthernQ;
 	int carsOnBridgeFromNorth;
@@ -11,13 +13,15 @@ private:
 	int timeUntilEmptyNorh;
 	int timeUntilEmptySouth;
 
+	void printStopLight();
+
 public:
 
-	StopLight(void);
-
-	void printStopLight();
+	
 	void addToQ(int i);
 	void toggleLight(int i);
+	void runStopLight();
+	void updateStopLight();
 };
 
 
