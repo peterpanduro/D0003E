@@ -61,21 +61,35 @@ void setupCLK(void) {
 
 int main(void)
 {
-	setupSettings();
+	
+	Run start = initRun(/*&bridge, &display, &stopLight*/);
+	return TINYTIMBER(&start, startupSequence, 0);
+	
+	
+// 	while(1){
+// 		UDR0 |= 0b1111;
+// 	}
+// 	
+	
+	
+//setupSettings();
 	
 // 	PORTE |= (1<<PCINT6);
 // 	PORTE |= (1<<PCINT4);
 
-	Time inputTimer = initTimer();
-	Display display = initDisplay();
-	Bridge bridge = initBridge(&display);
-	StopLight stopLight = initStopLight(&bridge);
-	InputHandler input = initInputHandler( &display, &inputTimer, &bridge);
 	
-	Run start = initRun(&bridge, &display, &stopLight);
 	
-	INSTALL(&input,inputRecieved,IRQ_PCINT1); //Up, down and enter.
-	INSTALL(&input,inputRecieved,IRQ_PCINT0); //Left and right.
-	return TINYTIMBER(&start, startupSequence, 0);
+
+// 	Time inputTimer = initTimer();
+// 	Display display = initDisplay();
+// 	Bridge bridge = initBridge(&display);
+// 	StopLight stopLight = initStopLight(&bridge);
+// 	InputHandler input = initInputHandler( &display, &inputTimer, &bridge);
+// 	
+// 	
+// 	
+// 	INSTALL(&input,inputRecieved,IRQ_PCINT1); //Up, down and enter.
+// 	INSTALL(&input,inputRecieved,IRQ_PCINT0); //Left and right.
+// 	
 }
 

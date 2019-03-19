@@ -21,7 +21,7 @@ typedef struct{
 	StopLight *stopLight;
 } Run;
 
-#define initRun(bridge, display, stopLight) {initObject(), bridge, display, stopLight}
+#define initRun(/*bridge, display, stopLight*/) {initObject(), NULL, NULL, NULL/*bridge, display, stopLight*/}
 
 int startupSequence(Run *self, int arg);
 

@@ -1,28 +1,28 @@
 #pragma once
-class StopLight{
+#include <inttypes.h>
+	class StopLight {
 
-private:
-	bool redNorthenLightOn = true;
-	bool redSouthernLightOn = true;
-	bool hasBeenUpdated = true;
-	bool startUp = true;
-	int carsInNorhtenQ;
-	int carsInSouthernQ;
-	int carsOnBridgeFromNorth;
-	int carsOnBridgeFromSouth;
-	int timeUntilEmptyNorh;
-	int timeUntilEmptySouth;
+	private:
+		bool redNorthenLightOn = true;
+		bool redSouthernLightOn = true;
+		bool hasBeenUpdated = true;
+		bool startUp = true;
+		int16_t carsInNorhtenQ;
+		int16_t carsInSouthernQ;
+		int16_t timeUntilEmptyNorh;
+		int16_t timeUntilEmptySouth;
+		int bridgeNorth[5] = { 0,0,0,0,0 };
+		int bridgeSouth[5] = { 0,0,0,0,0 };
+		int getCarsFromBridge(int);
+		void printStopLight();
 
-	void printStopLight();
-
-public:
-
-	
-	void addToQ(int i);
-	void toggleLight(int i);
-	void runStopLight();
-	void updateStopLight();
-};
-
+	public:
+		StopLight();
+		void Color(int16_t color);
+		void addToQ(int16_t);
+		void toggleLight(int16_t);
+		void runStopLight();
+		void updateStopLight();
+	};
 
 

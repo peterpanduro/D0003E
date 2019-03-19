@@ -5,11 +5,12 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 using namespace std; // I startdet using this too late :(
 
 
-/*StopLight::StopLight() {
+/*StopLight() {
 	redNorthenLight = true;
 	redSouthernLight = true;
 	carsInNorhtenQ = 0;
@@ -33,11 +34,11 @@ using namespace std; // I startdet using this too late :(
 //
 //
 
+StopLight::StopLight() {}
 
-void Color(int color) {
+void StopLight::Color(int16_t color) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
-
 
 //Prints everything. DONT MESS WITH IT! YOU WILL BREAK IT! Ja, jag menar dig Jonas Jacobsson!
 void StopLight::printStopLight() {
@@ -48,38 +49,50 @@ void StopLight::printStopLight() {
 				std::cout << "\n";
 			}
 	}
+
+	int carsOnBridgeFromNorth = getCarsFromBridge(1);
+	int carsOnBridgeFromSouth = getCarsFromBridge(2);
 	
 
 	Color(8); std::cout << "\n                                             ________________________";
-	Color(6); std::cout << "                                \\          /       \n";
+	Color(2); std::cout << "                                \\          /       \n";
 	Color(15); std::cout << "             ^^                             ";
 	Color(8); std::cout << "/                        \\        _";
 	Color(6); std::cout << "                       \\  ____  /       \n";
 	Color(15); std::cout << "           ^^  ^^";
 	Color(8); std::cout << "                          /                          \\      |";
 
-	if (redNorthenLightOn) {
-		Color(4);
-	}
-	else {
-		Color(0);
-	}
+	
 	std::cout << "0";
 
-	Color(8); std::cout << "|";
-	Color(6); std::cout << "                        /    \\         \n";
+	Color(8); 
+
+	
+
+	std::cout << "|";
+	Color(6); 
+	if (StopLight::redNorthenLightOn) {
+		Color(200);
+	}
+	else {
+		Color(8);
+	}
+	std::cout << "                        /    \\         \n";
 	Color(8); std::cout << "                                          / __________________________ \\     |";
 
-	if (redNorthenLightOn) {
-		Color(0);
-	}
-	else {
-		Color(10);
-	}
+	
 	std::cout << "0";
 
 	Color(8); std::cout << "|";
-	Color(6); std::cout << "                 ----- /      \\ -----  \n";
+	Color(6); 
+	
+	if (redNorthenLightOn) {
+		Color(8);
+	}
+	else {
+		Color(160);
+	}
+	std::cout << "                 ----- /      \\ -----  \n";
 	Color(3); std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 	Color(8); std::cout << "/";
 	Color(3); std::cout << "~";
@@ -229,15 +242,19 @@ void StopLight::printStopLight() {
 	Color(6); std::cout << "  __  __  __  __  __  __  __  __"; 
 	Color(8); std::cout << " _____/____|";
 	
-	if (redSouthernLightOn) {
-		Color(4);
-	} else {
-		Color(0);
-	}
+	
 	std::cout << "0";
 
 	Color(8); std::cout << "|____________________________ \\____";
-	Color(6); std::cout << "_  __  __| __  __  __  __  __  __  __   \n";
+	Color(6); 
+	
+	
+	if (redSouthernLightOn) {
+		Color(200);
+	} else {
+		Color(8);
+	}
+	std::cout << "_  __  __| __  __  __  __  __  __  __   \n";
 	
 	if (carsInSouthernQ > 1) {
 		Color(5); std::cout << "  .";
@@ -255,16 +272,19 @@ void StopLight::printStopLight() {
 	Color(3); std::cout << "    ~~~~~ ";
 	Color(8); std::cout << "|";
 	
-	if (redSouthernLightOn) {
-		Color(0);
-	}else {
-		Color(10);
-	}
+	
 	std::cout << "0";
 	
 	Color(8); std::cout << "|";
 	Color(3); std::cout << "                         ~~       ";
-	Color(8); std::cout << "\\                                       \n";
+	
+	
+	if (redSouthernLightOn) {
+		Color(8);
+	}else {
+		Color(160);
+	}
+	std::cout << "\\                                       \n";
 
 	if (carsInSouthernQ > 1) {
 		Color(5); std::cout << "  _\\_";
@@ -321,12 +341,16 @@ void StopLight::printStopLight() {
 	Color(3); std::cout << "            ~~~~                       ~~            ";
 	Color(8); std::cout << "\\___________________________________ \n";
 
-	for (int i = 0; i < 60; i++) {
+	for (int i = 0; i < 50; i++) {
 		std::cout << "\n";
 	}
 }
 
-void StopLight::addToQ(int i){//1 == northen Q, 2 == soutern Q.
+//void StopLight::printStopLight() {
+//	cout <<"\n"<< bridgeNorth[0] << bridgeNorth[1] << bridgeNorth[2] << bridgeNorth[3] << bridgeNorth[4];
+//}
+
+void StopLight::addToQ(int16_t i){//1 == northen Q, 2 == soutern Q.
 
 	hasBeenUpdated = true;
 	
@@ -337,7 +361,7 @@ void StopLight::addToQ(int i){//1 == northen Q, 2 == soutern Q.
 	}
 }
 
-void StopLight::toggleLight(int i) {//togglels the stoplight. If 1 == nort, 2 == south
+void StopLight::toggleLight(int16_t i) {//togglels the stoplight. If 1 == nort, 2 == south
 	
 	hasBeenUpdated = true;
 	
@@ -350,42 +374,47 @@ void StopLight::toggleLight(int i) {//togglels the stoplight. If 1 == nort, 2 ==
 	
 }
 
-void StopLight::runStopLight() {
-	while (true) {
+int StopLight::getCarsFromBridge(int i) {
+	int returnValue = 0;
+	if (i == 1) {
+		for (int j = 0; j < 5; j++) {
+			returnValue = bridgeNorth[j] + returnValue;
+		}
+	} else if (i == 2) {
+		for (int j = 0; j < 5; j++) {
+			returnValue = bridgeSouth[j] + returnValue;
+		}
+	}
+	return returnValue;
+}
 
-		if (carsOnBridgeFromNorth > 0 && timeUntilEmptyNorh >= 5){
-			hasBeenUpdated = true;
-			carsOnBridgeFromNorth--;
-		} else if (timeUntilEmptyNorh >= 5){
-			timeUntilEmptyNorh = 0;
+void StopLight::runStopLight() {
+
+	while (true) {
+		// Move cars on bridge
+		for (int i = 0; i < 4; i++) {
+			bridgeNorth[i] = bridgeNorth[i + 1];
+			bridgeSouth[i] = bridgeSouth[i + 1];
 		}
-	
-		if (carsOnBridgeFromSouth > 0 && timeUntilEmptySouth >= 5){
-			hasBeenUpdated = true;
-			carsOnBridgeFromSouth--;
-		} else if (timeUntilEmptySouth >= 5){
-			timeUntilEmptySouth = 0;
-		}
-	
-		if (carsInNorhtenQ > 0  && redNorthenLightOn == 0){
+
+		// Add car from queue
+		if (carsInNorhtenQ > 0  && redNorthenLightOn == 0) {
+			bridgeNorth[4] = 1;
 			hasBeenUpdated = true;
 			carsInNorhtenQ--;
-			carsOnBridgeFromNorth++;
+		} else {
+			bridgeNorth[4] = 0;
 		}
-	
-		if (carsInSouthernQ > 0  && redSouthernLightOn == 0){
+		
+		if (carsInSouthernQ > 0  && redSouthernLightOn == 0) {
+			bridgeSouth[4] = 1;
 			hasBeenUpdated = true;
 			carsInSouthernQ--;
-			carsOnBridgeFromSouth++;
+		} else {
+			bridgeSouth[4] = 0;
 		}
-	
-		if (carsOnBridgeFromNorth > 0){
-			timeUntilEmptyNorh++;
-		}
-	
-		if (carsOnBridgeFromSouth > 0){
-			timeUntilEmptySouth++;
-		}
+
+		printStopLight();
 
 		Sleep(1000);
 
@@ -393,11 +422,11 @@ void StopLight::runStopLight() {
 }
 
 
-void StopLight::updateStopLight() {
+/*void StopLight::updateStopLight() {
 	while(true){
 		if (hasBeenUpdated) {
 			hasBeenUpdated = false;
-			printStopLight();
+			
 		}
 	}
-}
+}*/
