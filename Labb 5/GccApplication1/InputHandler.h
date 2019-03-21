@@ -5,16 +5,19 @@
 #include "TinyTimber.h"
 #include "Display.h"
 #include "Bridge.h"
+#include "Run.h"
 
 typedef struct {
 	Object super;
-	Display *display;
-	Time *timer;
-	Bridge *bridge;
+	Run	*run;
+ 	Display *display;
+// 	Time *timer;
+// 	Bridge *bridge;
 } InputHandler;
 
-#define  initInputHandler(display, timer, bridge) {initObject(), display, timer, bridge}
+#define  initInputHandler(run, display/*, timer, bridge*/) {initObject(), run, display/*, timer, bridge*/}
 
 int inputRecieved(InputHandler *self, int arg);
+int signalRecieved(InputHandler *self, int arg);
 
 #endif

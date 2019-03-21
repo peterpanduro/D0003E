@@ -5,19 +5,23 @@
  * Author : larpet-5
  */ 
 
-#include "InputHandler.h"
-#include "Display.h"
 #include "TinyTimber.h"
 #include "Run.h"
 #include "Bridge.h"
 #include "StopLight.h"
+#include "InputHandler.h"
+#include "Display.h"
 
 #include <avr/io.h>
 #include <math.h>
 #include <stdint.h>
 
+#define FOSC 8000000 // Clock speed
+#define BAUD 9600
+#define UBER FOSC/16/BAUD-1
+int unsigned uber = UBER;
+
 void setupSettings(void) {
-	
 	// Enable. Low power wave form.
 	//LCDCRA = (1<<LCDEN) | (1<<LCDAB);
 	LCDCRA = 0xc0;
@@ -62,34 +66,31 @@ void setupCLK(void) {
 int main(void)
 {
 	
-	Run start = initRun(/*&bridge, &display, &stopLight*/);
-	return TINYTIMBER(&start, startupSequence, 0);
+	// Enable transmission and receive
+	UCSR0B |= (1<<TXEN0) | (1<<RXEN0) | (1<<RXCIE0);
+	// 8 bit communication
+	UCSR0C |= (1<<USBS0)|(3 << UCSZ00);
+	// Set Baud
+	UBRR0H = (unsigned char)(uber >> 8);
+	UBRR0L = (unsigned char)(uber);
 	
-	
-// 	while(1){
-// 		UDR0 |= 0b1111;
-// 	}
-// 	
-	
-	
-//setupSettings();
-	
+	setupSettings();
+	Display display = initDisplay();
+	Bridge bridge = initBridge(&display);	
+	Run start = initRun(&bridge, &display /*, &stopLight*/);
+	InputHandler input = initInputHandler(&start, &display);
+
+	INSTALL(&input,signalRecieved,IRQ_USART0_RX);							//Interupt signal in
+	INSTALL(&input,inputRecieved,IRQ_PCINT0);								//Up, down and enter.
+
+	return TINYTIMBER(NULL, NULL, NULL);
+
 // 	PORTE |= (1<<PCINT6);
 // 	PORTE |= (1<<PCINT4);
-
-	
-	
-
 // 	Time inputTimer = initTimer();
-// 	Display display = initDisplay();
-// 	Bridge bridge = initBridge(&display);
+// 	
 // 	StopLight stopLight = initStopLight(&bridge);
-// 	InputHandler input = initInputHandler( &display, &inputTimer, &bridge);
-// 	
-// 	
-// 	
-// 	INSTALL(&input,inputRecieved,IRQ_PCINT1); //Up, down and enter.
+ //	InputHandler input = initInputHandler( &display, &inputTimer, &bridge);
 // 	INSTALL(&input,inputRecieved,IRQ_PCINT0); //Left and right.
-// 	
 }
 

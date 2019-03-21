@@ -16,14 +16,16 @@
 
 typedef struct{
 	Object super;
-	Bridge *bridge;
-	Display *display;
-	StopLight *stopLight;
+ 	Bridge *bridge;
+ 	Display *display;
+ 	StopLight *stopLight;
 } Run;
 
-#define initRun(/*bridge, display, stopLight*/) {initObject(), NULL, NULL, NULL/*bridge, display, stopLight*/}
+#define initRun( bridge, display /*stopLight*/) {initObject(), bridge, display, NULL/*, stopLight*/}
 
 int startupSequence(Run *self, int arg);
+int USART_Receive(Run *self, int arg);
+int USART_Transmit(Run *self, int data);
 
 
 #endif

@@ -136,7 +136,7 @@ int toggle2(Display *self, int arg) {
 }
 
 int updateCarOnNorthBridge(Display *self, int arg){	//1 for true, 0 for false
-	if(arg == 0){
+	/*if(arg == 0){
 		LCDDR1 &= 0x0f;
 		LCDDR6 &= 0x0f;
 		LCDDR11 &= 0x0f;
@@ -146,12 +146,12 @@ int updateCarOnNorthBridge(Display *self, int arg){	//1 for true, 0 for false
 		LCDDR6 |= 0xf0;
 		LCDDR11 |= 0xf0;
 		LCDDR16 |= 0xf0;
-	}
+	}*/
 	return 0;
 }
 
 int updateCarOnSouthBridge(Display *self, int arg){	//1 for true, 0 for false
-	if(arg == 0){
+	/*if(arg == 0){
 		LCDDR1 &= 0xf0;
 		LCDDR6 &= 0xf0;
 		LCDDR11 &= 0xf0;
@@ -161,6 +161,6 @@ int updateCarOnSouthBridge(Display *self, int arg){	//1 for true, 0 for false
 		LCDDR6 |= 0x0f;
 		LCDDR11 |= 0x0f;
 		LCDDR16 |= 0x0f;
-	}
+	}*/
 	return 0;
 }

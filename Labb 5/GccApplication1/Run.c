@@ -5,36 +5,47 @@
  *  Author: jonjac-6
  */ 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "Run.h"
 
-#define FOSC 8000000 // Clock speed
-#define BAUD 9600
-#define UBER FOSC/16/BAUD-1
-int unsigned uber = UBER;
-int startUp = 1;
 
 
 int startupSequence(Run *self, int arg){
+		
 	
 	
+//	else if (arg == 99){
+// 		arg = 0;
+// 	}else{
+// 		arg++;
+// 	}
 	
-	if (startUp){
-		UCSR0B |= (1<<TXEN0) | (1<<RXEN0) | (1<<RXCIE0);
-		UCSR0C = (3 << UCSZ00) & ~(1 << USBS0);
-	
-		UBRR0H = (unsigned char)(uber >> 8);
-		UBRR0L = (unsigned char)(uber);
-		startUp = 0;
-	}
-	
-	UDR0 |= /*0b1111*/0x0;
-	
-	
-	AFTER(MSEC(1000), self, startupSequence, 0);
+// 	AFTER(MSEC(100), self, startupSequence, 0);
+//	ASYNC(self->stopLight, runStopLight, 0);
+//	AFTER(MSEC(100), self, startupSequence, arg);
 
+	ASYNC(self->bridge, debugginLoop, 0);
 	
-/*	ASYNC(self->stopLight, runStopLight, 0);*/
-	
+//	ASYNC(self, USART_Transmit, 1);
 	
 	return 0;
 }
+
+int USART_Transmit(Run *self, int arg){
+	//wait for empty transmit buffer
+	while (!(UCSR0A & (1<<UDRE0)));
+	UDR0 = arg;
+	ASYNC (self->display, printNumber,100 + arg);
+	return 0;
+}
+
+int USART_Receive(Run *self, int arg){
+	while ( !(UCSR0A & (1<<RXC0)));
+	SYNC(self->display,printNumber, 300 );
+	int t = UDR0;
+	if (t > 0 && t < 99) { // Only shows 00 whit occasional flimmer when not using if-statement
+		SYNC(self->display,printNumber, 300 + t );
+	}
+	return 0;
+}
+	

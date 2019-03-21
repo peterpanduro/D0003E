@@ -31,6 +31,7 @@ int changeTrafficLight(Bridge *self, int arg);  // 1 == north, 2 == south
 int manageCarsOnBridge(Bridge *self, int arg);	// Take care of the cars on the bridge.
 int carInQ(Bridge *self, int arg);				// 1 == north, 2 == south. 1 if true, 0 false.
 int checkRedLight(Bridge *self, int arg);		// 1 == north, 2 == south. 1 if true, 0 false.
+int debugginLoop(Bridge *self, int arg);		// a loop used just to loop fore debugging.
 
 
 #endif

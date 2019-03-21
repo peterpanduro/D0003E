@@ -112,3 +112,7 @@ int carInQ(Bridge *self, int arg){		// 1 == north, 2 == south. 1 if true, 0 fals
 	}
 	return 0;
 }
+
+int debugginLoop(Bridge *self, int arg){
+	while(1);
+}
