@@ -30,9 +30,6 @@ using namespace std; // I startdet using this too late :(
 // 15 = white
 // 8 = gray
 // 9 = blue
-//
-//
-//
 
 StopLight::StopLight() {}
 
@@ -42,7 +39,7 @@ void StopLight::Color(int16_t color) {
 
 //Prints everything. DONT MESS WITH IT! YOU WILL BREAK IT! Ja, jag menar dig Jonas Jacobsson!
 void StopLight::printStopLight() {
-
+/*
 	if (startUp) {
 		startUp = false;
 		for (int i = 0; i < 9000; i++) {
@@ -344,16 +341,10 @@ void StopLight::printStopLight() {
 	for (int i = 0; i < 50; i++) {
 		std::cout << "\n";
 	}
+	*/
 }
 
-//void StopLight::printStopLight() {
-//	cout <<"\n"<< bridgeNorth[0] << bridgeNorth[1] << bridgeNorth[2] << bridgeNorth[3] << bridgeNorth[4];
-//}
-
 void StopLight::addToQ(int16_t i){//1 == northen Q, 2 == soutern Q.
-
-	hasBeenUpdated = true;
-	
 	if (i == 1) {
 		carsInNorhtenQ++;
 	}else if(i == 2){
@@ -362,16 +353,11 @@ void StopLight::addToQ(int16_t i){//1 == northen Q, 2 == soutern Q.
 }
 
 void StopLight::toggleLight(int16_t i) {//togglels the stoplight. If 1 == nort, 2 == south
-	
-	hasBeenUpdated = true;
-	
 	if (1 == i) {
 		redNorthenLightOn = (true == redNorthenLightOn) ? false : true;
 	}else if (i == 2){
 		redSouthernLightOn = (true == redSouthernLightOn) ? false : true;
 	}
-	
-	
 }
 
 int StopLight::getCarsFromBridge(int i) {
@@ -400,7 +386,6 @@ void StopLight::runStopLight() {
 		// Add car from queue
 		if (carsInNorhtenQ > 0  && redNorthenLightOn == 0) {
 			bridgeNorth[4] = 1;
-			hasBeenUpdated = true;
 			carsInNorhtenQ--;
 		} else {
 			bridgeNorth[4] = 0;
@@ -408,7 +393,6 @@ void StopLight::runStopLight() {
 		
 		if (carsInSouthernQ > 0  && redSouthernLightOn == 0) {
 			bridgeSouth[4] = 1;
-			hasBeenUpdated = true;
 			carsInSouthernQ--;
 		} else {
 			bridgeSouth[4] = 0;
@@ -420,13 +404,3 @@ void StopLight::runStopLight() {
 
 	}
 }
-
-
-/*void StopLight::updateStopLight() {
-	while(true){
-		if (hasBeenUpdated) {
-			hasBeenUpdated = false;
-			
-		}
-	}
-}*/

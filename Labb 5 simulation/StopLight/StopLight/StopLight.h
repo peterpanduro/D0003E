@@ -1,11 +1,11 @@
 #pragma once
 #include <inttypes.h>
+#include "Communication.h"
 	class StopLight {
 
 	private:
 		bool redNorthenLightOn = true;
 		bool redSouthernLightOn = true;
-		bool hasBeenUpdated = true;
 		bool startUp = true;
 		int16_t carsInNorhtenQ;
 		int16_t carsInSouthernQ;
@@ -22,7 +22,7 @@
 		void addToQ(int16_t);
 		void toggleLight(int16_t);
 		void runStopLight();
-		void updateStopLight();
+		Communication communication;
 	};
 
 
