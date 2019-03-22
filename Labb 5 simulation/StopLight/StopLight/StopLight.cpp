@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include "Communication.h"
+#include <pthread.h>
 
 using namespace std; // I startdet using this too late :(
 
@@ -32,6 +34,10 @@ using namespace std; // I startdet using this too late :(
 // 9 = blue
 
 StopLight::StopLight() {}
+Communication communication;
+pthread_mutex_t transmiterMutex = communication.transmiterMutex;
+pthread_mutex_t reciverMutex = communication.reciverMutex;
+
 
 void StopLight::Color(int16_t color) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -39,7 +45,18 @@ void StopLight::Color(int16_t color) {
 
 //Prints everything. DONT MESS WITH IT! YOU WILL BREAK IT! Ja, jag menar dig Jonas Jacobsson!
 void StopLight::printStopLight() {
-/*
+	
+	int carsOnBridgeFromNorth = getCarsFromBridge(1);
+	int carsOnBridgeFromSouth = getCarsFromBridge(2);
+/*	cout << "-----------------------\n";
+	cout << "[N]Queue: " << carsInNorhtenQ << "\n";
+	cout << "[N]Redlight: " << redNorthenLightOn << "\n";
+	cout << "[N]Cars on bridge: " << carsOnBridgeFromNorth << "\n";
+	cout << "[S]Queue: " << carsInSouthernQ << "\n";
+	cout << "[S]Redlight: " << redSouthernLightOn << "\n";
+	cout << "[S]Cars on bridge: " << carsOnBridgeFromNorth << "\n";
+	cout << "-----------------------\n";*/
+
 	if (startUp) {
 		startUp = false;
 		for (int i = 0; i < 9000; i++) {
@@ -47,8 +64,7 @@ void StopLight::printStopLight() {
 			}
 	}
 
-	int carsOnBridgeFromNorth = getCarsFromBridge(1);
-	int carsOnBridgeFromSouth = getCarsFromBridge(2);
+	
 	
 
 	Color(8); std::cout << "\n                                             ________________________";
@@ -341,22 +357,50 @@ void StopLight::printStopLight() {
 	for (int i = 0; i < 50; i++) {
 		std::cout << "\n";
 	}
-	*/
 }
 
-void StopLight::addToQ(int16_t i){//1 == northen Q, 2 == soutern Q.
-	if (i == 1) {
-		carsInNorhtenQ++;
-	}else if(i == 2){
-		carsInSouthernQ++;
+void StopLight::io() {
+	while(1){
+		pthread_mutex_lock(&reciverMutex);
+		int recieved = communication.recieve();
+		pthread_mutex_unlock(&reciverMutex);
+		if (recieved >= 0) {
+			setLight(recieved);
+			printStopLight();
+		}		
+		
+		if (GetAsyncKeyState('S') & 0x8000) {
+			pthread_mutex_lock(&transmiterMutex);
+			communication.transmit(0b0100);
+			pthread_mutex_unlock(&transmiterMutex);
+			addToQ(2);
+			printStopLight();
+			while (GetAsyncKeyState('S') & 0x8000);
+		}
+		if (GetAsyncKeyState('N') & 0x8000) {
+			pthread_mutex_lock(&transmiterMutex);
+			communication.transmit(0b0001);
+			pthread_mutex_unlock(&transmiterMutex);
+			addToQ(1);
+			printStopLight();
+			while (GetAsyncKeyState('N') & 0x8000);
+		}
 	}
 }
 
-void StopLight::toggleLight(int16_t i) {//togglels the stoplight. If 1 == nort, 2 == south
-	if (1 == i) {
-		redNorthenLightOn = (true == redNorthenLightOn) ? false : true;
-	}else if (i == 2){
-		redSouthernLightOn = (true == redSouthernLightOn) ? false : true;
+void StopLight::setLight(int i) {
+	if (i == 9) { // North green
+		redNorthenLightOn = false;
+		redSouthernLightOn = true;
+	} else if (i == 6) { // South green
+		redNorthenLightOn = true;
+		redSouthernLightOn = false;
+	} else if (i == 10) { // RED
+		redNorthenLightOn = true;
+		redSouthernLightOn = true;
+	} else if (i == 5) { // GREEN
+		redNorthenLightOn = false;
+		redSouthernLightOn = false;
 	}
 }
 
@@ -374,19 +418,29 @@ int StopLight::getCarsFromBridge(int i) {
 	return returnValue;
 }
 
-void StopLight::runStopLight() {
+void StopLight::addToQ(int16_t i){//1 == northen Q, 2 == soutern Q.
+	if (i == 1) {
+		carsInNorhtenQ++;
+	}else if(i == 2){
+		carsInSouthernQ++;
+	}
+}
 
+void StopLight::runStopLight() {
 	while (true) {
 		// Move cars on bridge
 		for (int i = 0; i < 4; i++) {
 			bridgeNorth[i] = bridgeNorth[i + 1];
 			bridgeSouth[i] = bridgeSouth[i + 1];
 		}
-
+		
 		// Add car from queue
 		if (carsInNorhtenQ > 0  && redNorthenLightOn == 0) {
 			bridgeNorth[4] = 1;
 			carsInNorhtenQ--;
+			pthread_mutex_lock(&transmiterMutex);
+			communication.transmit(0b0010);
+			pthread_mutex_unlock(&transmiterMutex);
 		} else {
 			bridgeNorth[4] = 0;
 		}
@@ -394,13 +448,14 @@ void StopLight::runStopLight() {
 		if (carsInSouthernQ > 0  && redSouthernLightOn == 0) {
 			bridgeSouth[4] = 1;
 			carsInSouthernQ--;
+			pthread_mutex_lock(&transmiterMutex);
+			communication.transmit(0b1000);
+			pthread_mutex_unlock(&transmiterMutex);
 		} else {
 			bridgeSouth[4] = 0;
 		}
-
+		
 		printStopLight();
-
-		Sleep(1000);
-
+		Sleep(950);
 	}
 }

@@ -46,9 +46,8 @@ Communication::Communication() {
 }
 
 void Communication::transmit(int i) {
-	unsigned char message[] = {(unsigned char)i}; // Second byte terminate the message
+	unsigned char message[] = {(unsigned char)i};
 	int n = write(serial_port, &message, 1);
-	cout << "Written " << (int)message[0] << "\n";
 }
 
 int Communication::recieve() {
